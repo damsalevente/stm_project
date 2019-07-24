@@ -99,17 +99,10 @@ int main(void)
   uint8_t pRxData;
   uint8_t target = 0x00;
   uint8_t addr = 0x10; 
-
-  NAP_SPI_Read(&hspi2, addr, &pRxData); 
-
-  pRxData |= 1<<3;
-
-  NAP_SPI_Write(&hspi2,&addr, &pRxData);
-
-  NAP_SPI_Read(&hspi2, addr, &pRxData); 
-
-  target = pRxData;
-
+  uint16_t data[1024];
+  
+  uint8_t remainder; 
+  NAP_SPI_INIT_LSM6DS3(0);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -117,8 +110,8 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    target = pRxData;
-
+    NAP_SPI_Check_Fifo(&remainder);
+    HAL_UART_Transmit(&huart2, &remainder, sizeof(remainder), 0xff);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
