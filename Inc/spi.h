@@ -46,7 +46,6 @@ void NAP_SPI_INIT_LSM6DS3(uint8_t config);
 void NAP_SPI_Check_Fifo(uint8_t *result);
 void NAP_SPI_Read_Fifo(uint16_t *resultArray,uint8_t  size);
 
-
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
