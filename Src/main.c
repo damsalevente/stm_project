@@ -97,10 +97,10 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   uint8_t pRxData;
-  uint8_t target = 0x00;
+  uint8_t target = 0x23;
   uint8_t addr = 0x10; 
   uint16_t data[1024];
-  
+  uint8_t text_data [] = "\r\n"; 
   uint8_t remainder; 
   NAP_SPI_INIT_LSM6DS3(0);
   /* USER CODE END 2 */
@@ -111,7 +111,9 @@ int main(void)
   {
     /* USER CODE END WHILE */
     NAP_SPI_Check_Fifo(&remainder);
-    HAL_UART_Transmit(&huart2, &remainder, sizeof(remainder), 0xff);
+    NAP_SPI_Read(&hspi2,&target,&pRxData); 
+    HAL_UART_Transmit(&huart2,&pRxData, 1, 0xff);
+    HAL_UART_Transmit(&huart2,text_data,sizeof(text_data), 0xff);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

@@ -39,13 +39,13 @@ extern SPI_HandleTypeDef hspi2;
 void MX_SPI2_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void NAP_SPI_Read( SPI_HandleTypeDef* spiHandle, uint8_t data, uint8_t *rec);
+void NAP_SPI_Read( SPI_HandleTypeDef* spiHandle, uint8_t *data, uint8_t *rec);
 void NAP_SPI_Write( SPI_HandleTypeDef* spiHandle, uint8_t *addr, uint8_t *data);
-void NAP_SPI_INIT_Modify(uint8_t addr, uint8_t data);
+void NAP_SPI_INIT_Modify(uint8_t *addr, uint8_t *data);
 void NAP_SPI_INIT_LSM6DS3(uint8_t config);
 void NAP_SPI_Check_Fifo(uint8_t *result);
 void NAP_SPI_Read_Fifo(uint16_t *resultArray,uint8_t  size);
- 
+
 
 /* USER CODE END Prototypes */
 
