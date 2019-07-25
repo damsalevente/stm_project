@@ -96,30 +96,47 @@ int main(void)
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
 
+  // rx and address for using in the main loop
   uint8_t pRxData = 0x00;
-  uint8_t target = 0x08;
-  uint8_t addr = 0x10; 
-  uint16_t data[1024];
+  uint8_t addr; 
+  // data in circular buffer 
+  uint16_t data[512];
+  uint8_t pointer = 0;
   uint8_t text_data [] = "\r\n"; 
-  uint8_t remainder; 
   NAP_SPI_INIT_LSM6DS3(0);
   /* USER CODE END 2 */
-    NAP_SPI_Read(&hspi2,&target,&pRxData);
-    HAL_UART_Transmit(&huart2,&pRxData, 1, 0xff);
-    HAL_UART_Transmit(&huart2,text_data,sizeof(text_data), 0xff);
+  // HAL_UART_Transmit(&huart2,&pRxData, 1, 0xff);
+  // HAL_UART_Transmit(&huart2,text_data,sizeof(text_data), 0xff);
 
-  
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
-//    NAP_SPI_Check_Fifo(&remainder);
-//    NAP_SPI_Read(&hspi2,&target,&pRxData); 
-//    HAL_UART_Transmit(&huart2,&pRxData, 1, 0xff);
-//    HAL_UART_Transmit(&huart2,text_data,sizeof(text_data), 0xff);
-//    /* USER CODE BEGIN 3 */
+    addr = FIFO_STATUS1;
+    NAP_SPI_Read(&hspi2, &addr, &pRxData);
+    // thats a lot of data to store 
+    addr = FIFO_DATA_OUT_L;
+    NAP_SPI_Read(&hspi2, &addr,&pRxData);
+    data[pointer] = pRxData;
+    // read high
+    addr = FIFO_DATA_OUT_H;
+    NAP_SPI_Read(&hspi2, &addr,&pRxData);
+    data[pointer] |= pRxData<<7;
+    pointer++;
+    if(pointer==1024)
+    {
+      pointer = 0;
+      HAL_UART_Transmit(&huart2, (uint8_t)data,sizeof(data[0])* (1024), 0xff);
+
+     }
   }
+  /* USER CODE END WHILE */
+  //    NAP_SPI_Check_Fifo(&remainder);
+  //    NAP_SPI_Read(&hspi2,&addr,&pRxData); 
+  //    HAL_UART_Transmit(&huart2,&pRxData, 1, 0xff);
+  //    HAL_UART_Transmit(&huart2,text_data,sizeof(text_data), 0xff);
+  //    /* USER CODE BEGIN 3 */
+
   /* USER CODE END 3 */
 }
 

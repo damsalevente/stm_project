@@ -149,32 +149,41 @@ void NAP_SPI_INIT_LSM6DS3(uint8_t config)
 
   if(config == 0)
   {
+
+    //enable x,y,z axis ? 
+    address = CTRL9_XL;
+    data = 0x38;
+    NAP_SPI_INIT_Modify(&address,&data);
+
+    // enable x,y,z axis 
+    address = CTRL10_C;
+    data = 0x38;
+    NAP_SPI_INIT_Modify(&address,&data);
+
+    address = CTRL1_XL;
+    data = (uint8_t)1<<4;
+    NAP_SPI_INIT_Modify(&address,&data);
+
+    address = CTRL2_G;
+    data = (uint8_t)1<<4   ;
+    NAP_SPI_INIT_Modify(&address,&data);
+
     // Continous Mode settings 110 in the first 3 register 
     address = FIFO_CTRL5;
-    data = 0x06;
+    data = 0x06 | 1<<3;
     NAP_SPI_INIT_Modify(&address,&data);
-    // Fifo ctrl 1 can set threshold, skip for now 
-    //NAP_SPI_INIT_Modify(, );
+    // Set threshold to the max in fifo ctrl1 
+    address = FIFO_CTRL1;
+    data = 0xff; // set full output 
+
     // Fifo ctrl2 register skipped
     //Fifo ctrol3 enable gyro to fifo
     address = FIFO_CTRL3;
     data = 0x09;
     NAP_SPI_INIT_Modify(&address,&data);
-    // Fifo odr selection set to 12.5Khz
-    address = FIFO_CTRL5;
-    data = (uint8_t)1<<3  ; 
-    NAP_SPI_INIT_Modify(&address,&data);
 
     address = CTRL3_C;
     data = (uint8_t)1<<6   ;
-    NAP_SPI_INIT_Modify(&address,&data);
-
-    address = CTRL1_XL;
-    data = (uint8_t)1<<4   ;
-    NAP_SPI_INIT_Modify(&address,&data);
-
-    address = CTRL2_G;
-    data = (uint8_t)1<<4   ;
     NAP_SPI_INIT_Modify(&address,&data);
   }
 
