@@ -96,21 +96,20 @@ int main(void)
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
 
-  // unread_data and address for using lsm6ds3 in the main loop
-  volatile uint8_t unread_data = 0x00;
+  volatile uint8_t receive = 0x00;
   uint8_t addr; 
-  // data in circular buffer 
-  uint16_t data[512];
+   uint16_t pattern= 0x00; 
+  uint16_t data[0xff];
   uint16_t dptr = 0;
-  for(uint8_t i = 0; i < 0xfe; i++)
-  {
-    data[i]  = 0;
-  }
+  uint16_t unread_data;
 
-  uint8_t text_data [] = "\r\n"; 
+  uint8_t text_data [] = "\n"; 
+
+
   NAP_SPI_INIT_LSM6DS3(0);
+
   /* USER CODE END 2 */
-  // HAL_UART_Transmit(&huart2,&unread_data, 1, 0xff);
+  // HAL_UART_Transmit(&huart2,&receive, 1, 0xff);
   // HAL_UART_Transmit(&huart2,text_data,sizeof(text_data), 0xff);
 
   /* Infinite loop */
@@ -119,35 +118,53 @@ int main(void)
   {
     // check fifo status for unread data
     addr = FIFO_STATUS1;
-    NAP_SPI_Read(&hspi2, &addr, &unread_data);
+    NAP_SPI_Read(&hspi2, &addr, &receive);
+    unread_data = receive;
     addr = FIFO_STATUS2;
-    NAP_SPI_Read(&hspi2, &addr, &unread_data);
-    if(unread_data & 0x80)
+    NAP_SPI_Read(&hspi2, &addr, &receive);
+    unread_data |= receive & 0x0f;
+    if(receive & 0x80)
     {
+      for(uint16_t i = 0;i<unread_data;i++)
+      {
+        // Decide what are we gonna read next (new function)
+        addr = FIFO_STATUS3;
+        NAP_SPI_Read(&hspi2, &addr, &receive);
+        pattern = receive;
+
+        addr = FIFO_STATUS4;
+        NAP_SPI_Read(&hspi2, &addr, &receive);
+        pattern |= (receive)<<8;
+        
+
         // read low
         addr = FIFO_DATA_OUT_L;
-        NAP_SPI_Read(&hspi2, &addr,&unread_data);
-        data[dptr] = unread_data;
+        NAP_SPI_Read(&hspi2, &addr,&receive);
+        HAL_UART_Transmit(&huart2, &receive,1, 0xff);
+        data[dptr] = receive;
 
         // read high
         addr = FIFO_DATA_OUT_H;
-        NAP_SPI_Read(&hspi2, &addr,&unread_data);
-        data[dptr] |= unread_data<<7;
+        NAP_SPI_Read(&hspi2, &addr,&receive);
+        HAL_UART_Transmit(&huart2, &receive,1, 0xff);
+        data[dptr] |= receive<<8;
 
+        HAL_UART_Transmit(&huart2,text_data,sizeof(text_data), 0xff);
         // circular buffer
         dptr++;
-        if(dptr==511)
+        if(dptr==0xff)
         {
           dptr = 0;
-          HAL_UART_Transmit(&huart2, (uint8_t)data,512, 0xff);
         }
+
+      }
     }
   }
 
   /* USER CODE END WHILE */
   //    NAP_SPI_Check_Fifo(&remainder);
-  //    NAP_SPI_Read(&hspi2,&addr,&unread_data); 
-  //    HAL_UART_Transmit(&huart2,&unread_data, 1, 0xff);
+  //    NAP_SPI_Read(&hspi2,&addr,&receive); 
+  //    HAL_UART_Transmit(&huart2,&receive, 1, 0xff);
   //    HAL_UART_Transmit(&huart2,text_data,sizeof(text_data), 0xff);
   //    /* USER CODE BEGIN 3 */
 

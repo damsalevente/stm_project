@@ -166,11 +166,19 @@ void NAP_SPI_INIT_LSM6DS3(uint8_t config)
     NAP_SPI_INIT_Modify(&address,&data);
 
     address = CTRL1_XL;
-    data = (uint8_t)3<<4;
+    data = (uint8_t)1<<4;
+    NAP_SPI_INIT_Modify(&address,&data);
+
+    address = FIFO_CTRL2;
+    data = (uint8_t)1<<7   ;
+    NAP_SPI_INIT_Modify(&address,&data);
+
+    address = FIFO_CTRL4;
+    data = 1<<3;
     NAP_SPI_INIT_Modify(&address,&data);
 
     address = CTRL2_G;
-    data = (uint8_t)3<<4   ;
+    data = (uint8_t)1<<4   ;
     NAP_SPI_INIT_Modify(&address,&data);
 
     address = FIFO_CTRL5;
@@ -178,7 +186,7 @@ void NAP_SPI_INIT_LSM6DS3(uint8_t config)
     NAP_SPI_INIT_Modify(&address,&data);
 
     address = FIFO_CTRL1;
-    data = 0xff; // set full output 
+    data = 0xff;    
     NAP_SPI_INIT_Modify(&address,&data);
 
     address = FIFO_CTRL3;
