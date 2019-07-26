@@ -199,6 +199,8 @@ void NAP_SPI_Check_Fifo(uint8_t *result)
   NAP_SPI_Read(&hspi2,&addr,result);
 }
 
+
+
 void NAP_SPI_Read_Fifo(uint16_t *resultArray,uint8_t  size)
 {
   if(size<1)
@@ -218,7 +220,66 @@ void NAP_SPI_Read_Fifo(uint16_t *resultArray,uint8_t  size)
   }
 }
 
+sensor_data_t NAP_SPI_GetData() 
+{
+    sensor_data_t sensor_data;
+    uint8_t add;
+    uint8_t data;
 
+    //read read read  
+    add =  OUTX_L_XL;
+    NAP_SPI_Read(&hspi2, &add, &data);
+    sensor_data.accx = data;
+
+
+    add = OUTX_H_XL;
+    NAP_SPI_Read(&hspi2, &add, &data);
+    sensor_data.accx |= data<<7;
+
+
+    add = OUTY_L_XL;
+    NAP_SPI_Read(&hspi2, &add, &data);
+    sensor_data.accy = data;
+
+
+    add = OUTY_H_XL;
+    NAP_SPI_Read(&hspi2, &add, &data);
+    sensor_data.accy |= data<<7;
+
+    add = OUTZ_L_XL;
+    NAP_SPI_Read(&hspi2, &add, &data);
+    sensor_data.accz = data;
+
+    add = OUTZ_H_XL;
+    NAP_SPI_Read(&hspi2, &add, &data);
+    sensor_data.accz |= data<<7;
+
+    add = OUTX_L_G;
+    NAP_SPI_Read(&hspi2, &add, &data);
+    sensor_data.gx = data;
+
+    add = OUTX_H_G;
+    NAP_SPI_Read(&hspi2, &add, &data);
+    sensor_data.gx |= data<<7;
+
+    add = OUTY_L_G;
+    NAP_SPI_Read(&hspi2, &add, &data);
+    sensor_data.gy = data;
+
+    add = OUTY_H_G;
+    NAP_SPI_Read(&hspi2, &add, &data);
+    sensor_data.gy |= data<<7;
+
+    add = OUTZ_L_G;
+    NAP_SPI_Read(&hspi2, &add, &data);
+    sensor_data.gz = data;
+
+    add = OUTZ_H_G;
+    NAP_SPI_Read(&hspi2, &add, &data);
+    sensor_data.gz |= data<<7;
+
+    return sensor_data;
+}
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
