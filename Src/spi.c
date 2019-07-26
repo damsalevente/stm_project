@@ -128,12 +128,14 @@ void NAP_SPI_Write( SPI_HandleTypeDef* spiHandle, uint8_t *addr, uint8_t *data)
   HAL_SPI_Transmit(spiHandle, data,1,HAL_MAX_DELAY);
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9,GPIO_PIN_SET);
 }
+
 void NAP_SPI_INIT_Modify(uint8_t *addr, uint8_t *data)
 {
-  uint8_t read_val;
-  NAP_SPI_Read(&hspi2, addr,&read_val);
+  uint8_t read_val = 0x00;
+  NAP_SPI_Read(&hspi2,addr, &read_val);
   read_val |= *data;
-  NAP_SPI_Write(&hspi2, addr, &read_val); 
+  NAP_SPI_Write(&hspi2,addr, &read_val); 
+  NAP_SPI_Read(&hspi2,addr,&read_val);
 }
 
 void NAP_SPI_INIT_LSM6DS3(uint8_t config)
@@ -149,7 +151,6 @@ void NAP_SPI_INIT_LSM6DS3(uint8_t config)
 
   if(config == 0)
   {
-
     //enable x,y,z axis ? 
     address = CTRL9_XL;
     data = 0x38;
@@ -161,25 +162,27 @@ void NAP_SPI_INIT_LSM6DS3(uint8_t config)
     NAP_SPI_INIT_Modify(&address,&data);
 
     address = CTRL1_XL;
-    data = (uint8_t)1<<4;
+    data = (uint8_t)3<<4;
     NAP_SPI_INIT_Modify(&address,&data);
 
     address = CTRL2_G;
-    data = (uint8_t)1<<4   ;
+    data = (uint8_t)3<<4   ;
     NAP_SPI_INIT_Modify(&address,&data);
 
-    // Continous Mode settings 110 in the first 3 register 
     address = FIFO_CTRL5;
     data = 0x06 | 1<<3;
     NAP_SPI_INIT_Modify(&address,&data);
-    // Set threshold to the max in fifo ctrl1 
+
     address = FIFO_CTRL1;
     data = 0xff; // set full output 
+    NAP_SPI_INIT_Modify(&address,&data);
 
-    // Fifo ctrl2 register skipped
-    //Fifo ctrol3 enable gyro to fifo
     address = FIFO_CTRL3;
     data = 0x09;
+    NAP_SPI_INIT_Modify(&address,&data);
+
+    address = CTRL3_C;
+    data = (uint8_t)1<<6   ;
     NAP_SPI_INIT_Modify(&address,&data);
 
     address = CTRL3_C;
@@ -188,12 +191,14 @@ void NAP_SPI_INIT_LSM6DS3(uint8_t config)
   }
 
 }
+
 // returns result parameter as a number of how many unwritten data is in the fifo
 void NAP_SPI_Check_Fifo(uint8_t *result)
 {
   uint8_t addr = FIFO_STATUS1;
   NAP_SPI_Read(&hspi2,&addr,result);
 }
+
 void NAP_SPI_Read_Fifo(uint16_t *resultArray,uint8_t  size)
 {
   if(size<1)

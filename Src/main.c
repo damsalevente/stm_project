@@ -96,44 +96,59 @@ int main(void)
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
 
-  // rx and address for using in the main loop
-  uint8_t pRxData = 0x00;
+  // unread_data and address for using lsm6ds3 in the main loop
+  uint8_t unread_data = 0x00;
   uint8_t addr; 
   // data in circular buffer 
   uint16_t data[512];
-  uint8_t pointer = 0;
+  uint8_t dptr = 0;
+  for(uint8_t i = 0; i < 0xfe; i++)
+  {
+    data[i]  = 0;
+  }
+
   uint8_t text_data [] = "\r\n"; 
   NAP_SPI_INIT_LSM6DS3(0);
   /* USER CODE END 2 */
-  // HAL_UART_Transmit(&huart2,&pRxData, 1, 0xff);
+  // HAL_UART_Transmit(&huart2,&unread_data, 1, 0xff);
   // HAL_UART_Transmit(&huart2,text_data,sizeof(text_data), 0xff);
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    addr = FIFO_STATUS1;
-    NAP_SPI_Read(&hspi2, &addr, &pRxData);
-    // thats a lot of data to store 
-    addr = FIFO_DATA_OUT_L;
-    NAP_SPI_Read(&hspi2, &addr,&pRxData);
-    data[pointer] = pRxData;
-    // read high
-    addr = FIFO_DATA_OUT_H;
-    NAP_SPI_Read(&hspi2, &addr,&pRxData);
-    data[pointer] |= pRxData<<7;
-    pointer++;
-    if(pointer==1024)
+    // check fifo status for unread data
+    addr = FIFO_STATUS2;
+    NAP_SPI_Read(&hspi2, &addr, &unread_data);
+    if(unread_data & 0x80)
     {
-      pointer = 0;
-      HAL_UART_Transmit(&huart2, (uint8_t)data,sizeof(data[0])* (1024), 0xff);
+      //read like 10 data first 
+      for(int i=0;i<10;i++){
+        // read low
+        addr = FIFO_DATA_OUT_L;
+        NAP_SPI_Read(&hspi2, &addr,&unread_data);
+        data[dptr] = unread_data;
 
-     }
+        // read high
+        addr = FIFO_DATA_OUT_H;
+        NAP_SPI_Read(&hspi2, &addr,&unread_data);
+        data[dptr] |= unread_data<<7;
+
+        // circular buffer
+        dptr++;
+        if(dptr==511)
+        {
+          dptr = 0;
+        }
+      }
+     HAL_UART_Transmit(&huart2, (uint8_t)data,512, 0xff);
+    }
   }
+
   /* USER CODE END WHILE */
   //    NAP_SPI_Check_Fifo(&remainder);
-  //    NAP_SPI_Read(&hspi2,&addr,&pRxData); 
-  //    HAL_UART_Transmit(&huart2,&pRxData, 1, 0xff);
+  //    NAP_SPI_Read(&hspi2,&addr,&unread_data); 
+  //    HAL_UART_Transmit(&huart2,&unread_data, 1, 0xff);
   //    HAL_UART_Transmit(&huart2,text_data,sizeof(text_data), 0xff);
   //    /* USER CODE BEGIN 3 */
 
