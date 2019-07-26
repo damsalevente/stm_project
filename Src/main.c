@@ -97,7 +97,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // unread_data and address for using lsm6ds3 in the main loop
-  uint8_t unread_data = 0x00;
+  volatile uint8_t unread_data = 0x00;
   uint8_t addr; 
   // data in circular buffer 
   uint16_t data[512];
@@ -118,12 +118,13 @@ int main(void)
   while (1)
   {
     // check fifo status for unread data
+    addr = FIFO_STATUS1;
+    NAP_SPI_Read(&hspi2, &addr, &unread_data);
+    // XD  
     addr = FIFO_STATUS2;
     NAP_SPI_Read(&hspi2, &addr, &unread_data);
     if(unread_data & 0x80)
     {
-      //read like 10 data first 
-      for(int i=0;i<10;i++){
         // read low
         addr = FIFO_DATA_OUT_L;
         NAP_SPI_Read(&hspi2, &addr,&unread_data);
@@ -140,7 +141,6 @@ int main(void)
         {
           dptr = 0;
         }
-      }
      HAL_UART_Transmit(&huart2, (uint8_t)data,512, 0xff);
     }
   }
