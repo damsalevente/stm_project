@@ -101,7 +101,7 @@ int main(void)
   uint8_t addr; 
   // data in circular buffer 
   uint16_t data[512];
-  uint8_t dptr = 0;
+  uint16_t dptr = 0;
   for(uint8_t i = 0; i < 0xfe; i++)
   {
     data[i]  = 0;
@@ -120,7 +120,6 @@ int main(void)
     // check fifo status for unread data
     addr = FIFO_STATUS1;
     NAP_SPI_Read(&hspi2, &addr, &unread_data);
-    // XD  
     addr = FIFO_STATUS2;
     NAP_SPI_Read(&hspi2, &addr, &unread_data);
     if(unread_data & 0x80)
@@ -140,8 +139,8 @@ int main(void)
         if(dptr==511)
         {
           dptr = 0;
+          HAL_UART_Transmit(&huart2, (uint8_t)data,512, 0xff);
         }
-     HAL_UART_Transmit(&huart2, (uint8_t)data,512, 0xff);
     }
   }
 

@@ -1,6 +1,7 @@
 import serial 
 with serial.Serial('/dev/ttyACM0', 115200) as s:
-    x = s.read()
-    print(x)
+  while(1):
+      x = s.read(1000)
+      print(x)
 
 

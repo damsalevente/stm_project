@@ -108,7 +108,7 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* spiHandle)
 } 
 
 // Todo: Read multiple, polling is probably fine tho 
-void NAP_SPI_Read( SPI_HandleTypeDef* spiHandle, uint8_t *data, uint8_t *rec)
+void NAP_SPI_Read( SPI_HandleTypeDef* spiHandle, uint8_t *data,volatile uint8_t *rec)
 {
   // the first bit is 1, indicating the read (lsm6ds3 datasheet spi config)
   *data |= NAP_SPI_READ_FLAG;
@@ -119,7 +119,7 @@ void NAP_SPI_Read( SPI_HandleTypeDef* spiHandle, uint8_t *data, uint8_t *rec)
 }
 
 // R/W is 0 so we can use pointer
-void NAP_SPI_Write( SPI_HandleTypeDef* spiHandle, uint8_t *addr, uint8_t *data)
+void NAP_SPI_Write( SPI_HandleTypeDef* spiHandle, uint8_t *addr,volatile uint8_t *data)
 {
   // Check if r/w permission is available 
   *addr &= ~(1<<7);
@@ -159,6 +159,10 @@ void NAP_SPI_INIT_LSM6DS3(uint8_t config)
     // enable x,y,z axis 
     address = CTRL10_C;
     data = 0x38;
+    NAP_SPI_INIT_Modify(&address,&data);
+
+    address = CTRL4_C;
+    data = 0x01;
     NAP_SPI_INIT_Modify(&address,&data);
 
     address = CTRL1_XL;
