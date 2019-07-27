@@ -120,9 +120,11 @@ int main(void)
     if(unread_data) 
     {
       data[dptr++] = NAP_SPI_GetData();
+      transmit_sensordata(data[dptr-1]);
+      HAL_Delay(500);
       if(dptr> 1023)
       {
-        transmit_buffer(data, dptr);
+        //transmit_buffer(data, dptr);
         dptr = 0;
       }
     }

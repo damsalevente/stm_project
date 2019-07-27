@@ -41,8 +41,7 @@ void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 void transmit_buffer(sensor_data_t* , uint16_t);
-
-/* USER CODE END Prototypes */
+void transmit_sensordata(sensor_data_t sd);
 
 #ifdef __cplusplus
 }
