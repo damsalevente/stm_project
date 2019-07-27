@@ -122,6 +122,7 @@ int main(void)
       data[dptr++] = NAP_SPI_GetData();
       if(dptr> 1023)
       {
+        transmit_buffer(data, dptr);
         dptr = 0;
       }
     }

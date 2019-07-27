@@ -101,6 +101,50 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 
 /* USER CODE BEGIN 1 */
 
+void transmit_sensordata(sensor_data_t sd)
+{
+  char *msg = "\r\n";
+  HAL_UART_Transmit(&huart2, msg, 3,0xff);
+
+  uint8_t data = sd.accx & 0x00ff;
+  HAL_UART_Transmit(&huart2, &data, 1, 0xff);
+  data = sd.accx >>8; 
+  HAL_UART_Transmit(&huart2, &data, 1, 0xff);
+
+  data = sd.accy & 0x00ff;
+  HAL_UART_Transmit(&huart2, &data, 1, 0xff);
+  data = sd.accy >>8; 
+  HAL_UART_Transmit(&huart2, &data, 1, 0xff);
+
+  data = sd.accz & 0x00ff;
+  HAL_UART_Transmit(&huart2, &data, 1, 0xff);
+  data = sd.accz >>8; 
+  HAL_UART_Transmit(&huart2, &data, 1, 0xff);
+
+  data = sd.gx & 0x00ff;
+  HAL_UART_Transmit(&huart2, &data, 1, 0xff);
+  data = sd.gx >>8; 
+  HAL_UART_Transmit(&huart2, &data, 1, 0xff);
+
+  data = sd.gy & 0x00ff;
+  HAL_UART_Transmit(&huart2, &data, 1, 0xff);
+  data = sd.gy >>8; 
+  HAL_UART_Transmit(&huart2, &data, 1, 0xff);
+
+  data = sd.gz  & 0x00ff;
+  HAL_UART_Transmit(&huart2, &data, 1, 0xff);
+  data = sd.gz >>8; 
+  HAL_UART_Transmit(&huart2, &data, 1, 0xff);
+
+}
+
+void transmit_buffer(sensor_data_t *buffer, uint16_t size)
+{
+  for(uint16_t i = 0; i<size; i++)
+  {
+    transmit_sensordata(buffer[i]);
+  }
+}
 
 
 /* USER CODE END 1 */

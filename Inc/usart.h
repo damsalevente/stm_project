@@ -25,6 +25,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "spi.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -39,6 +40,7 @@ extern UART_HandleTypeDef huart2;
 void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+void transmit_buffer(sensor_data_t* , uint16_t);
 
 /* USER CODE END Prototypes */
 
